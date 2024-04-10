@@ -2,7 +2,6 @@
 # Nom, Matricule
 
 import sys
-global m,n
 
 def read_problem(MyGraph, input_file="input.txt"):
     """Fonctions pour lire/écrire dans les fichier. Vous pouvez les modifier,
@@ -51,6 +50,7 @@ def write(fileName, content):
 
 
 def main(args):
+    global m,n,visited
     """Fonction main/Main function"""
     input_file = args[0]
     output_file = args[1]
@@ -63,48 +63,41 @@ def main(args):
 
     def coordonneespuits(matrice):
         coordonneespuits = {}
-        listeCoordonnees = []
+        listeCoordonnees = set()
         # je dois creer un cadre
         nombreColonne = len(matrice[0])
         nombreLigne = len(matrice)
         for j in range(nombreLigne):
             for i in range(nombreColonne):
                 if matrice[j][i] == 1:
-                    coordonneespuits[(j, i)] = 0
-                    listeCoordonnees.append((j,i))
-        return coordonneespuits, listeCoordonnees
+                    listeCoordonnees.add((j,i))
+        return listeCoordonnees
 
-    def explorer_adjacents(cell, coordonneespuits, listeCoordonnees, visited):
+    def explorer_adjacents(cell, listeCoordonnees):
+        j, i = cell
+        cellules_adjacentes = [(j - 1, i), (j + 1, i), (j, i - 1), (j, i + 1)]
 
-        # Vérifiez si la cellule est dans listeCoordonnees et sa valeur est 1
-        if cell in listeCoordonnees and coordonneespuits[cell] == 0:
-            visited.append(cell)
-            # Changez la valeur de la cellule dans coordonneespuits
-            coordonneespuits[cell] = 1 # Remplacez nouvelle_valeur par la valeur que vous souhaitez
-                # Déterminez les cellules adjacentes
-            # Supposons que cell est un tuple (x, y)
-            j, i = cell
-            cellules_adjacentes = [(j - 1, i), (j + 1, i), (j, i - 1), (j, i + 1)]
+        # Pour chaque cellule adjacente, répétez le processus
+        for adj in cellules_adjacentes:
+            if adj in listeCoordonnees:
+                visited.add(adj)
+                listeCoordonnees.discard(adj)
+                explorer_adjacents(adj, listeCoordonnees)
 
-            # Pour chaque cellule adjacente, répétez le processus
-            for adj in cellules_adjacentes:
-                explorer_adjacents(adj, coordonneespuits, listeCoordonnees, visited)
+    listeCoordonnees = coordonneespuits(matrice)
 
-    coordonneespuits,listeCoordonnees = coordonneespuits(matrice)
-    listeParcours  =[]
-    # Augmenter la limite de profondeur de récursion
-    sys.setrecursionlimit(1000000)
-    for element in listeCoordonnees :
-        # donc on a deja visite la coordonnee
-        if coordonneespuits[element] == 1:
-            continue
-        else :
-            visited = []
-            explorer_adjacents(element,coordonneespuits,listeCoordonnees,visited)
-        listeParcours.append(visited)
-    try :
-        answer = max(len(sous_liste) for sous_liste in listeParcours)
-    except :
+    listeParcours  = []
+
+    while len(listeCoordonnees) > 0 :
+        element = listeCoordonnees.pop()
+        visited = {element}
+        sys.setrecursionlimit(1000000)
+        explorer_adjacents(element,listeCoordonnees)
+        if len(visited) > 0:
+            listeParcours.append(visited)
+    try:
+        answer = max(len(sous_ensemble) for sous_ensemble in listeParcours)
+    except:
         answer = 0
 
     # answering
