@@ -34,14 +34,15 @@ def read(fileName):
 #Function that writes in the output file.
 #The content parameter is a string
 def write(fileName, content):
-    Outputfile = open(fileName, "w")
-    Outputfile.write(content)
-    Outputfile.close()
+    with open(fileName, "w") as outputFile:
+        for ensemble in content:
+            ligne = ' '.join(sorted(ensemble))
+            outputFile.write(ligne + "\n")
 
 #Fonction principale à compléter.
 #students : liste des noms des étudiants
 #pairs : liste des paires d'étudiants à ne pas grouper ensemble
-#        chaque paire est sous format de liste [x, y]
+# chaque paire est sous format de liste [x, y]
 #Valeur de retour : string contenant la réponse. Si c'est impossible, retourner "impossible"
 #                   Sinon, retourner en un string les deux lignes représentant les
 #                   les deux groupes d'étudants (les étudiants sont séparés par des
@@ -55,8 +56,8 @@ def write(fileName, content):
 #               otherwise, return in a single string both ouput lines that contain
 #               two groups (students are separated by spaces and the two lines by a \n)
 def createGroups(students, pairs):
-
-    resultat = [[element] for element in students]
+    longueur =len(students)
+    students_sets = [{element} for element in students]
     def verifierPresence(ensemble):
         liste_d_ensembles = [set(sous_liste) for sous_liste in pairs]
         for element in liste_d_ensembles:
@@ -64,30 +65,33 @@ def createGroups(students, pairs):
                 return False
         return True
 
-    while True:
-        tmp = []
-        for i in resultat:
-            for j in resultat:
-                ensI = set(i)
-                ensJ = set(j)
-                ensPartieJ = ensJ - ensI
-                if ensI != ensJ and i + j[len(j) - 1:] not in tmp and ensPartieJ not in ensI and len(
-                        i + j[len(j) - 1:]) == len(set(i + j[len(j) - 1:])):
-                    ajouter = verifierPresence(set(i + j[len(j) - 1:]))
-                    if ajouter:
-                        tmp.append(i + j[len(j) - 1:])
-        if len(tmp) == 0: break
-        resultat = tmp.copy()
 
+    resultat = []
 
-    if len(resultat) == 0: return "impossible"
-    print(resultat)
-    breakpoint()
+    for k in students_sets :
+        compteur = 0
+        while compteur <= longueur:
+            tmp = [k]
+            for i in tmp :
+                for j in students_sets:
+                    ensPartieJ = j - i
+                    nvEns = i.union(j)
+                    if i != j and nvEns not in tmp and nvEns not in resultat and ensPartieJ not in i and len(nvEns) > 1 :
+                        ajouter = verifierPresence(nvEns)
+                        if ajouter:
+                            tmp.append(nvEns)
+                            resultat.append(nvEns)
+            compteur += 1
 
-    return resultat
-
-    
-
+    students = set(students)
+    if len(resultat) == 0: return [{"impossible"}]
+    # on cherche le 2 groupe
+    # on sait que resultat ne peut jamais etre egale a 1
+    for i in range(len(resultat) - 1):
+        for j in range(i + 1, len(resultat)):
+            if resultat[i].union(resultat[j]) == students and len(resultat[i].intersection(resultat[j])) == 0:
+                return [resultat[i], resultat[j]]
+    return [{"impossible"}]
 
 #Normalement, vous ne devriez pas avoir à modifier
 #Normaly, you shouldn't need to modify

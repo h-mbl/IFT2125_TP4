@@ -1,7 +1,7 @@
 
-liste = [1, 2, 3 ,4]
+liste = [1, 2, 3 ,4,5,6,7]
 
-resultat =  [set(element) for element in liste]
+resultat =  [{element} for element in liste]
 longueur = len(liste)
 
 def verifierPresence(ensemble):
@@ -12,20 +12,24 @@ def verifierPresence(ensemble):
             return False
     return True
 
-
-while True:
-    tmp = []
-    for i in resultat:
-        for j in resultat:
-            ensI = set(i)
-            ensJ = set(j)
-            ensPartieJ = ensJ - ensI
-            if ensI != ensJ and i + j[len(j)-1:] not in tmp and ensPartieJ not in ensI and len(i + j[len(j)-1:]) == len(set(i + j[len(j)-1:])):
-                ajouter = verifierPresence(set(i + j[len(j)-1:]))
-                if ajouter :
-                    tmp.append(i + j[len(j)-1:] )
-    if len(tmp) == 0: break
-    resultat = tmp.copy()
+for k in resultat:
+    a = 0
+    while True:
+        tmp = [k]
+        a = 0
+        for i in tmp:
+            for j in resultat:
+                a= 0
+                ensPartieJ = j - i
+                nvEns = i.union(j)
+                if i != j and nvEns not in tmp and ensPartieJ not in i :
+                    ajouter = verifierPresence(nvEns)
+                    if ajouter :
+                        tmp.append(nvEns)
+            a = 0
+        a = 0
+        if len(tmp) == 0: break
+        resultat = tmp.copy()
 
 
 # Afficher le résultat
