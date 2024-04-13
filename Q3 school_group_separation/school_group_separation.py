@@ -56,9 +56,11 @@ def write(fileName, content):
 #               otherwise, return in a single string both ouput lines that contain
 #               two groups (students are separated by spaces and the two lines by a \n)
 def createGroups(students, pairs):
+    a = 0
     try:
         students = [int(x) for x in students]
-        pairs = [int(x) for x in pairs]
+        pairs = [[int(element) for element in sous_liste] for sous_liste in
+                                     pairs]
     except: pass
     students_sets = [[element] for element in students]
     tmp_student = set(students)
@@ -73,19 +75,18 @@ def createGroups(students, pairs):
         combinaison = []
         combinaison_set = []
         for i in range(len(element)):
+            a  = 0
+            elementI = element[i]
             for j in range(i + 1, len(element)):
-                elementI = element[i]
-                elementI_set = set(elementI)
                 elementJ = element[j]
-                elementJ_set = set(elementJ)
-                #ensPartieJ = elementJ - elementI
-                nvEns = elementI + elementJ[len(elementJ)-1:]
-                nvEns_set = set(nvEns)
-                if len(nvEns) > 1 and nvEns_set not in resultat_set:
-                    ajouter = verifierPresence(nvEns_set)
-                    if ajouter:
+                verifier = set([elementI[-1]] + [elementJ[-1]])
+                if verifier not in pairs :
+                    nvEns = elementI + elementJ[len(elementJ) - 1:]
+                    nvEns_set = set(nvEns)
+                    if len(nvEns) > 1 and nvEns_set not in resultat_set:
                         combinaison.append(nvEns)
                         combinaison_set.append(nvEns_set)
+            a = 0
         return combinaison,combinaison_set
     def combinaisonPremierePartie(element,debut):
         combinaison = []
@@ -93,15 +94,12 @@ def createGroups(students, pairs):
         for i in range(len(element)):
             for j in range(debut, len(b)):
                 elementI = element
-                elementI_set = set(elementI)
                 elementJ = b[j]
-                elementJ_set = set(elementJ)
-                # ensPartieJ = elementJ - elementI
-                nvEns = elementI + elementJ[len(elementJ) - 1:]
-                nvEns_set = set(nvEns)
-                if len(nvEns) > 1 and nvEns_set not in resultat_set:
-                    ajouter = verifierPresence(nvEns_set)
-                    if ajouter:
+                verifier = set([elementI[-1]] + [elementJ[-1]])
+                if verifier not in pairs:
+                    nvEns = elementI + elementJ[len(elementJ) - 1:]
+                    nvEns_set = set(nvEns)
+                    if len(nvEns) > 1 and nvEns_set not in resultat_set:
                         combinaison.append(nvEns)
                         combinaison_set.append(nvEns_set)
         return combinaison, combinaison_set
@@ -147,7 +145,7 @@ def createGroups(students, pairs):
                     break
         else: break
 
-    if len(resultat) == 0: return [{"impossible"}]
+    return [{"impossible"}]
 
 
 #Normalement, vous ne devriez pas avoir à modifier
