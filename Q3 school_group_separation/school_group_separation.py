@@ -87,41 +87,68 @@ def createGroups(students, pairs):
                         combinaison.append(nvEns)
                         combinaison_set.append(nvEns_set)
         return combinaison,combinaison_set
+    def combinaisonPremierePartie(element,debut):
+        combinaison = []
+        combinaison_set = []
+        for i in range(len(element)):
+            for j in range(debut, len(b)):
+                elementI = element
+                elementI_set = set(elementI)
+                elementJ = b[j]
+                elementJ_set = set(elementJ)
+                # ensPartieJ = elementJ - elementI
+                nvEns = elementI + elementJ[len(elementJ) - 1:]
+                nvEns_set = set(nvEns)
+                if len(nvEns) > 1 and nvEns_set not in resultat_set:
+                    ajouter = verifierPresence(nvEns_set)
+                    if ajouter:
+                        combinaison.append(nvEns)
+                        combinaison_set.append(nvEns_set)
+        return combinaison, combinaison_set
+    def recherche():
+        for i in range(len(resultat_set) - 1):
+            for j in range(i + 1, len(resultat_set)):
+                if resultat_set[i].union(resultat_set[j]) == tmp_student and len(
+                        resultat_set[i].intersection(resultat_set[j])) == 0:
+                    return [resultat_set[i], resultat_set[j]]
+        return "impossible"
 
     resultat = []
     resultat_set = []
-    temporaire = students_sets.copy()
-    tmp, tmp_set = combinaison(temporaire)
-    temporaire = tmp.copy()
-    resultat.extend(tmp)
-    resultat_set.extend(tmp_set)
-    if len(temporaire) > 0 :
-        while len(temporaire[0]) < len(students_sets) - 1:
-            tmp_x = []
-            x = temporaire[0]
-            delete = temporaire.copy()
-            for element in delete :
-                y = element
-                if x[:-1] == y[:-1] :
-                    tmp_x.append(element)
-                    temporaire.remove(element)
-                else : break
-            tmp,tmp_set = combinaison(tmp_x)
-            temporaire.extend(tmp)
-            resultat.extend(tmp)
-            resultat_set.extend(tmp_set)
-            a = 0
-            if len(temporaire) == 0 :
-                break
-    students = set(students)
+    b = students_sets.copy()
+    for z in range(len(b)):
+        a = b[z]
+        tmp, tmp_set = combinaisonPremierePartie(a,z+1)
+        temporaire = tmp.copy()
+        resultat.extend(tmp)
+        resultat_set.extend(tmp_set)
+        if len(temporaire) > 0 :
+            while len(temporaire[0]) < len(students_sets) - 1:
+                tmp_x = []
+                x = temporaire[0]
+                delete = temporaire.copy()
+                for element in delete :
+                    y = element
+                    if x[:-1] == y[:-1] :
+                        tmp_x.append(element)
+                        temporaire.remove(element)
+                    else : break
+                a = 0
+                tmp,tmp_set = combinaison(tmp_x)
+                temporaire.extend(tmp)
+                resultat.extend(tmp)
+                resultat_set.extend(tmp_set)
+                a = 0
+                if len(temporaire) == 0 :
+                    element_recherche = recherche()
+                    if element_recherche != "impossible" :
+                        a = 0
+                        return element_recherche
+                    break
+        else: break
+
     if len(resultat) == 0: return [{"impossible"}]
-    # on cherche le 2 groupe
-    # on sait que resultat ne peut jamais etre egale a 1
-    for i in range(len(resultat_set) - 1):
-        for j in range(i + 1, len(resultat_set)):
-            if resultat_set[i].union(resultat_set[j]) == students and len(resultat_set[i].intersection(resultat_set[j])) == 0:
-                return [resultat_set[i], resultat_set[j]]
-    return [{"impossible"}]
+
 
 #Normalement, vous ne devriez pas avoir à modifier
 #Normaly, you shouldn't need to modify
