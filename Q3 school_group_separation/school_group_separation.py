@@ -60,62 +60,67 @@ def createGroups(students, pairs):
         students = [int(x) for x in students]
         pairs = [int(x) for x in pairs]
     except: pass
-    students_sets = [{element} for element in students]
+    students_sets = [[element] for element in students]
     tmp_student = set(students)
+    pairs = [set(sous_liste) for sous_liste in pairs]
     def verifierPresence(ensemble):
-        liste_d_ensembles = [set(sous_liste) for sous_liste in pairs]
-        for element in liste_d_ensembles:
-            if len(ensemble.intersection(element)) > 1:
+        for element in pairs :
+            if len(ensemble.intersection(element)) > 1 :
                 return False
         return True
 
     def combinaison(element):
         combinaison = []
+        combinaison_set = []
         for i in range(len(element)):
             for j in range(i + 1, len(element)):
                 elementI = element[i]
+                elementI_set = set(elementI)
                 elementJ = element[j]
-                ensPartieJ = elementJ - elementI
-                nvEns = elementI.union(elementJ)
-                if len(nvEns) > 1 and nvEns not in resultat:
-                    ajouter = verifierPresence(nvEns)
-                    if ajouter: combinaison.append(nvEns)
-        return combinaison
+                elementJ_set = set(elementJ)
+                #ensPartieJ = elementJ - elementI
+                nvEns = elementI + elementJ[len(elementJ)-1:]
+                nvEns_set = set(nvEns)
+                if len(nvEns) > 1 and nvEns_set not in resultat_set:
+                    ajouter = verifierPresence(nvEns_set)
+                    if ajouter:
+                        combinaison.append(nvEns)
+                        combinaison_set.append(nvEns_set)
+        return combinaison,combinaison_set
 
     resultat = []
+    resultat_set = []
     temporaire = students_sets.copy()
+    tmp, tmp_set = combinaison(temporaire)
+    temporaire = tmp.copy()
+    resultat.extend(tmp)
+    resultat_set.extend(tmp_set)
     if len(temporaire) > 0 :
-        tmp = combinaison(temporaire)
-        tmp = tmp[:len(temporaire)-1]
-        temporaire = tmp.copy()
-        resultat.extend(tmp)
         while len(temporaire[0]) < len(students_sets) - 1:
-            debut = students_sets.index({min(tmp_student - temporaire[0])})
             tmp_x = []
-            x = sorted(list(temporaire[0]))
+            x = temporaire[0]
             delete = temporaire.copy()
             for element in delete :
-                y = sorted(list(element))
+                y = element
                 if x[:-1] == y[:-1] :
                     tmp_x.append(element)
                     temporaire.remove(element)
                 else : break
-            tmp = combinaison(tmp_x)
+            tmp,tmp_set = combinaison(tmp_x)
             temporaire.extend(tmp)
             resultat.extend(tmp)
-            #temporaire.pop(0)
+            resultat_set.extend(tmp_set)
             a = 0
             if len(temporaire) == 0 :
                 break
-
     students = set(students)
     if len(resultat) == 0: return [{"impossible"}]
     # on cherche le 2 groupe
     # on sait que resultat ne peut jamais etre egale a 1
-    for i in range(len(resultat) - 1):
-        for j in range(i + 1, len(resultat)):
-            if resultat[i].union(resultat[j]) == students and len(resultat[i].intersection(resultat[j])) == 0:
-                return [resultat[i], resultat[j]]
+    for i in range(len(resultat_set) - 1):
+        for j in range(i + 1, len(resultat_set)):
+            if resultat_set[i].union(resultat_set[j]) == students and len(resultat_set[i].intersection(resultat_set[j])) == 0:
+                return [resultat_set[i], resultat_set[j]]
     return [{"impossible"}]
 
 #Normalement, vous ne devriez pas avoir à modifier
