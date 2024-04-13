@@ -56,8 +56,10 @@ def write(fileName, content):
 #               otherwise, return in a single string both ouput lines that contain
 #               two groups (students are separated by spaces and the two lines by a \n)
 def createGroups(students, pairs):
-    longueur =len(students)
+    try: students = [int(x) for x in students]
+    except: pass
     students_sets = [{element} for element in students]
+    tmp_student = set(students)
     def verifierPresence(ensemble):
         liste_d_ensembles = [set(sous_liste) for sous_liste in pairs]
         for element in liste_d_ensembles:
@@ -65,23 +67,35 @@ def createGroups(students, pairs):
                 return False
         return True
 
+    def combinaison(elementI,debut):
+        combinaison = []
+        for j in range(debut,len(students)):
+            elementJ = {students[j]}
+            ensPartieJ = elementJ - elementI
+            nvEns = elementI.union(elementJ)
+            if len(nvEns) > 1 and nvEns not in resultat:
+                ajouter = verifierPresence(nvEns)
+                if ajouter: combinaison.append(nvEns)
+        return combinaison
 
     resultat = []
+    temporaire = students_sets.copy()
+    if len(temporaire) > 0 :
 
-    for k in students_sets :
-        compteur = 0
-        while compteur <= longueur:
-            tmp = [k]
-            for i in tmp :
-                for j in students_sets:
-                    ensPartieJ = j - i
-                    nvEns = i.union(j)
-                    if i != j and nvEns not in tmp and nvEns not in resultat and ensPartieJ not in i and len(nvEns) > 1 :
-                        ajouter = verifierPresence(nvEns)
-                        if ajouter:
-                            tmp.append(nvEns)
-                            resultat.append(nvEns)
-            compteur += 1
+        while len(temporaire[0]) < len(students_sets) - 1:
+            debut = students_sets.index({min(tmp_student - temporaire[0])})
+            if True:
+                x =[]
+                #for element in tmp[]:
+                #    if element inter
+                a = 0
+                tmp = combinaison(temporaire[0],debut)
+                temporaire.extend(tmp)
+                resultat.extend(tmp)
+                temporaire.pop(0)
+                a = 0
+            if len(temporaire) == 0 :
+                break
 
     students = set(students)
     if len(resultat) == 0: return [{"impossible"}]
