@@ -56,7 +56,9 @@ def write(fileName, content):
 #               otherwise, return in a single string both ouput lines that contain
 #               two groups (students are separated by spaces and the two lines by a \n)
 def createGroups(students, pairs):
-    try: students = [int(x) for x in students]
+    try:
+        students = [int(x) for x in students]
+        pairs = [int(x) for x in pairs]
     except: pass
     students_sets = [{element} for element in students]
     tmp_student = set(students)
@@ -67,33 +69,42 @@ def createGroups(students, pairs):
                 return False
         return True
 
-    def combinaison(elementI,debut):
+    def combinaison(element):
         combinaison = []
-        for j in range(debut,len(students)):
-            elementJ = {students[j]}
-            ensPartieJ = elementJ - elementI
-            nvEns = elementI.union(elementJ)
-            if len(nvEns) > 1 and nvEns not in resultat:
-                ajouter = verifierPresence(nvEns)
-                if ajouter: combinaison.append(nvEns)
+        for i in range(len(element)):
+            for j in range(i + 1, len(element)):
+                elementI = element[i]
+                elementJ = element[j]
+                ensPartieJ = elementJ - elementI
+                nvEns = elementI.union(elementJ)
+                if len(nvEns) > 1 and nvEns not in resultat:
+                    ajouter = verifierPresence(nvEns)
+                    if ajouter: combinaison.append(nvEns)
         return combinaison
 
     resultat = []
     temporaire = students_sets.copy()
     if len(temporaire) > 0 :
-
+        tmp = combinaison(temporaire)
+        tmp = tmp[:len(temporaire)-1]
+        temporaire = tmp.copy()
+        resultat.extend(tmp)
         while len(temporaire[0]) < len(students_sets) - 1:
             debut = students_sets.index({min(tmp_student - temporaire[0])})
-            if True:
-                x =[]
-                #for element in tmp[]:
-                #    if element inter
-                a = 0
-                tmp = combinaison(temporaire[0],debut)
-                temporaire.extend(tmp)
-                resultat.extend(tmp)
-                temporaire.pop(0)
-                a = 0
+            tmp_x = []
+            x = sorted(list(temporaire[0]))
+            delete = temporaire.copy()
+            for element in delete :
+                y = sorted(list(element))
+                if x[:-1] == y[:-1] :
+                    tmp_x.append(element)
+                    temporaire.remove(element)
+                else : break
+            tmp = combinaison(tmp_x)
+            temporaire.extend(tmp)
+            resultat.extend(tmp)
+            #temporaire.pop(0)
+            a = 0
             if len(temporaire) == 0 :
                 break
 
