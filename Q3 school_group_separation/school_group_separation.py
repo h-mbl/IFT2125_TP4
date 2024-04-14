@@ -52,10 +52,10 @@ def createGroups(students, pairs):
 
     cas = {}
 
-    def ensemble(element,position):
-        if len(cas[element][0].intersection(ensemble1)) == 0 and position == 1:
+    def ensemble(element,elementEnsemble,position):
+        if len(elementEnsemble.intersection(ensemble1)) == 0 and position == 1:
             ensemble1.add(element)
-        elif len(cas[element][0].intersection(ensemble2)) == 0 and position == 2:
+        elif len(elementEnsemble.intersection(ensemble2)) == 0 and position == 2:
             ensemble2.add(element)
         else :
             return 0
@@ -87,43 +87,49 @@ def createGroups(students, pairs):
     creationDictionnaire()
     if len(cas) == 0 : return [{"impossible"}]
     tmp = students[0]
+
     elementParcourir = cas[tmp][0].copy()
+
     cas[tmp][2] = 1
     cas[tmp][1] = 1
+
     tmp_student.discard(tmp)
-
-
-    ensemble(tmp,1)
-
+    cas.pop(tmp)
+    ensemble(tmp,elementParcourir,1)
     placerDansTableau(elementParcourir,1)
 
     while len(elementParcourir) > 0 or len(tmp_student) > 0:
         if len(elementParcourir) > 0 :
             tmp = elementParcourir.pop()
             cas[tmp][1] = 1
-            tmp_student.discard(tmp)
-            retour = ensemble(tmp,cas[tmp][2])
-            if retour != None : return [{"impossible"}]
+            position = cas[tmp][2]
             tmp_elementParcourir = cas[tmp][0].copy()
-            delete = tmp_elementParcourir.copy()
-            for element in delete:
-                if element not in tmp_student:
-                    tmp_elementParcourir.discard(element)
-            placerDansTableau(tmp_elementParcourir,cas[tmp][2])
+            tmp_student.discard(tmp)
+            cas.pop(tmp)
+            retour = ensemble(tmp,tmp_elementParcourir,position)
+            if retour != None :
+                return [{"impossible"}]
+            delete = tmp_elementParcourir - tmp_student
+            tmp_elementParcourir = tmp_elementParcourir - delete
+            placerDansTableau(tmp_elementParcourir,position)
             elementParcourir = elementParcourir.union(tmp_elementParcourir)
         elif len(tmp_student) > 0:
             tmp = tmp_student.pop()
             cas[tmp][1] = 1
-            if cas[tmp][2] == 0:
-                cas[tmp][2] = 1
-            retour = ensemble(tmp, cas[tmp][2])
-            if retour != None: return [{"impossible"}]
             tmp_elementParcourir = cas[tmp][0].copy()
-            delete = tmp_elementParcourir.copy()
-            for element in delete:
-                if element not in tmp_student:
-                    tmp_elementParcourir.discard(element)
-            placerDansTableau(tmp_elementParcourir, cas[tmp][2])
+            position = cas[tmp][2]
+            if position == 0:
+                cas[tmp][2] = 1
+                position =  1
+            cas.pop(tmp)
+            retour = ensemble(tmp,tmp_elementParcourir, position)
+            if retour != None :
+                return [{"impossible"}]
+
+            delete = tmp_elementParcourir - tmp_student
+            tmp_elementParcourir = tmp_elementParcourir - delete
+
+            placerDansTableau(tmp_elementParcourir, position)
             elementParcourir = elementParcourir.union(tmp_elementParcourir)
 
 
