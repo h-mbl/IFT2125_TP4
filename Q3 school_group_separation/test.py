@@ -2,7 +2,8 @@
 # Nom, matricule
 
 import sys
-
+from collections import defaultdict
+sys.setrecursionlimit(1000000)
 
 # Fonction pour lire le fichier d'input. Vous ne deviez pas avoir besoin de la modifier.
 # Retourne la liste des noms d'étudiants (students) et la liste des paires qui ne peuvent
@@ -42,33 +43,45 @@ def write(fileName, content):
 
 
 
-def createGroups(students, dangerous_pairs):
-    dangerous_pairs = [set(pair) for pair in dangerous_pairs]
-    sys.setrecursionlimit(1000000)
+def createGroups(students, pairs):
+    def build_groups(dangerous_dict):
+        visited = set()
+        group1 = []
+        group2 = []
 
-    def backtrack(group1, group2, remaining):
-        if not remaining:
-            return group1, group2
+        def dfs(node, group, other_group):
+            visited.add(node)
+            group.append(node)
+            for neighbor in dangerous_dict[node]:
+                if neighbor not in visited:
+                    dfs(neighbor, other_group, group)
 
-        student = remaining.pop()
+        for node in dangerous_dict:
+            if node not in visited:
+                dfs(node, group1, group2)
 
-        for group, other_group in ((group1, group2), (group2, group1)):
-            if not any(student in pair & set(group) for pair in dangerous_pairs):
-                group.add(student)
-                result = backtrack(group, other_group, remaining)
-                if result is not None:
-                    return result
-                group.remove(student)
-
-        remaining.add(student)
-        return None
-
-    group1, group2 = backtrack(set(), set(), set(students))
-    if group1 is None:
-        return "Impossible"
-    return group1, group2
+        return group1, group2 , visited
+    def build_dangerous_pairs_dict(dangerous_pairs):
+        dangerous_dict = defaultdict(list)
+        for pair in dangerous_pairs:
+            child1, child2 = pair
+            dangerous_dict[child1].append(child2)
+            dangerous_dict[child2].append(child1)
+        return dangerous_dict
 
 
+    dangerous_dict = build_dangerous_pairs_dict(pairs)
+    groupe1 , groupe2 , visited  = build_groups(dangerous_dict)
+    tmp_student = set(students)
+    elementSeul = tmp_student - visited
+    if len(elementSeul) == 0:
+        groupe1.extend(list(elementSeul))
+    groupe1 = set(groupe1)
+    groupe2 = set(groupe2)
+    if len(groupe1.intersection(groupe2)) > 0 or len(groupe1.union(groupe2)) != len(students):
+        return [{"impossible"}]
+    else:
+        return groupe1, groupe2
 # Normalement, vous ne devriez pas avoir à modifier
 # Normaly, you shouldn't need to modify
 def main(args):

@@ -2,6 +2,7 @@
 # Nom, matricule
 
 import sys
+from collections import defaultdict
 
 
 # Fonction pour lire le fichier d'input. Vous ne deviez pas avoir besoin de la modifier.
@@ -50,8 +51,6 @@ def createGroups(students, pairs):
     ensemble1 = set()
     ensemble2 = set()
 
-    cas = {}
-
     def ensemble(element,elementEnsemble,position):
         if len(elementEnsemble.intersection(ensemble1)) == 0 and position == 1:
             ensemble1.add(element)
@@ -69,22 +68,19 @@ def createGroups(students, pairs):
             if cas[x][2] == 0:
                 cas[x][2] = position
 
-    def creationDictionnaire():
-        for element in students:
-            tmp = set()
-            for ensemble in pairs:
-                if len(ensemble.intersection({element})) > 0:
-                    reponse = ensemble - {element}
-                    tmp.add(reponse.pop())
-            # ensemble, visited, ensemble
-            if len(tmp) > 0:
-                cas[element] = [tmp, 0, 0]
-            else :
-                ensemble1.add(element)
-                tmp_student.discard(element)
+    def build_dangerous_pairs_dict():
+        cas = defaultdict(lambda: [set(), 0, 0])
+        nonVisite = set(students)
 
+        for pair in pairs:
+            student1, student2 = pair
+            cas[student1][0].add(student2)
+            cas[student2][0].add(student1)
+            nonVisite.discard(student1)
+            nonVisite.discard(student2)
+        return cas, nonVisite
 
-    creationDictionnaire()
+    cas,nonVisite = build_dangerous_pairs_dict()
     if len(cas) == 0 : return [{"impossible"}]
     tmp = students[0]
 
@@ -145,7 +141,6 @@ def main(args):
     output_file = args[1]
     students, pairs = read(input_file)
     output = createGroups(students, pairs)
-    a = 0
     write(output_file, output)
 
 
