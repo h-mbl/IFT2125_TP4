@@ -36,11 +36,9 @@ def read(fileName):
 # Function that writes in the output file.
 # The content parameter is a string
 def write(fileName, content):
-    with open(fileName, "w") as outputFile:
-        for ensemble in content:
-            ligne = ' '.join(sorted(ensemble))
-            outputFile.write(ligne + "\n")
-
+    Outputfile = open(fileName, "w")
+    Outputfile.write(content)
+    Outputfile.close()
 
 
 def createGroups(students, pairs):
@@ -70,69 +68,88 @@ def createGroups(students, pairs):
 
     def build_dangerous_pairs_dict():
         cas = defaultdict(lambda: [set(), 0, 0])
-        nonVisite = set(students)
-
         for pair in pairs:
             student1, student2 = pair
             cas[student1][0].add(student2)
             cas[student2][0].add(student1)
-            nonVisite.discard(student1)
-            nonVisite.discard(student2)
-        return cas, nonVisite
+        return cas
 
-    cas,nonVisite = build_dangerous_pairs_dict()
-    if len(cas) == 0 : return [{"impossible"}]
+    # construire le dictionnaire des elements non-adjcents
+    cas = build_dangerous_pairs_dict()
+
+    if len(cas) == 0 : return "impossible"
+
+    #choisir un element pour commencer
     tmp = students[0]
 
+    # liste des elements qui ne peuvent pas etre dans un meme groupe que l'element choisit
     elementParcourir = cas[tmp][0].copy()
 
+    # position , visite = 1
     cas[tmp][2] = 1
     cas[tmp][1] = 1
 
+    # enlever l'element dans la liste des elements et dans le dictionnaire des elemennts non-adjcents
     tmp_student.discard(tmp)
     cas.pop(tmp)
+
+    # placer l'elements dans l'ensemble
     ensemble(tmp,elementParcourir,1)
+
+    # definir la position des ses elements dangereux
     placerDansTableau(elementParcourir,1)
+
+    def traiter_element(element, elementParcourir, position=None):
+        # definir la position
+        cas[element][1] = 1
+        if position is None:
+            position = cas[element][2]
+        else:
+            cas[element][2] = position
+
+        # enregistrer la liste des elements qui ne peuvent pas etre dans un meme groupe que l'element choisit
+        tmp_elementParcourir = cas[element][0].copy()
+
+        # enlever l'element dans la liste des elements et dans le dictionnaire des elemennts non-adjcents
+        tmp_student.discard(element)
+        cas.pop(element)
+
+        # place l'element dans l'ensemble
+        retour = ensemble(element, tmp_elementParcourir, position)
+
+        # si l'element ne peut pas etre placer retourner None
+        if retour is not None:
+            return None
+
+        # trouver l'element dans la liste des etudiant qui n'a pas encore ete parcourit
+        delete = tmp_elementParcourir - tmp_student
+        tmp_elementParcourir = tmp_elementParcourir - delete
+
+        # on defini alors la position des elements et on le place dans la liste principale de l'iteration
+        placerDansTableau(tmp_elementParcourir, position)
+        elementParcourir = elementParcourir.union(tmp_elementParcourir)
+
+        return elementParcourir
 
     while len(elementParcourir) > 0 or len(tmp_student) > 0:
         if len(elementParcourir) > 0 :
+            # choisir un element pour commencer
             tmp = elementParcourir.pop()
-            cas[tmp][1] = 1
-            position = cas[tmp][2]
-            tmp_elementParcourir = cas[tmp][0].copy()
-            tmp_student.discard(tmp)
-            cas.pop(tmp)
-            retour = ensemble(tmp,tmp_elementParcourir,position)
-            if retour != None :
-                return [{"impossible"}]
-            delete = tmp_elementParcourir - tmp_student
-            tmp_elementParcourir = tmp_elementParcourir - delete
-            placerDansTableau(tmp_elementParcourir,position)
-            elementParcourir = elementParcourir.union(tmp_elementParcourir)
+            elementParcourir = traiter_element(tmp, elementParcourir)
+
+        # si les pairs dangereux ne sont pas connexe
+        # on applique que precedement
         elif len(tmp_student) > 0:
             tmp = tmp_student.pop()
-            cas[tmp][1] = 1
-            tmp_elementParcourir = cas[tmp][0].copy()
             position = cas[tmp][2]
             if position == 0:
                 cas[tmp][2] = 1
                 position =  1
-            cas.pop(tmp)
-            retour = ensemble(tmp,tmp_elementParcourir, position)
-            if retour != None :
-                return [{"impossible"}]
+            elementParcourir  = traiter_element(tmp, elementParcourir, position)
+        if elementParcourir is None:
+            return "impossible"
 
-            delete = tmp_elementParcourir - tmp_student
-            tmp_elementParcourir = tmp_elementParcourir - delete
-
-            placerDansTableau(tmp_elementParcourir, position)
-            elementParcourir = elementParcourir.union(tmp_elementParcourir)
-
-
-    if len(ensemble2.intersection(ensemble1)) > 0 or len(ensemble1.union(ensemble2)) != len(students):
-        return [{"impossible"}]
-    else :
-        return ensemble1, ensemble2
+    return ' '.join(ensemble1) + '\n' + ' '.join(ensemble2)
 
 # Normalement, vous ne devriez pas avoir à modifier
 # Normaly, you shouldn't need to modify
