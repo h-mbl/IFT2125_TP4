@@ -23,8 +23,6 @@ def read_problem(MyGraph, input_file="input.txt"):
         if premiereLigne:
             premiereLigne = False
             ligne = ligne.strip()
-            m = ligne[0]
-            n = ligne[2]
             continue
         ligne_entiers = []  # Initialiser une liste vide pour les entiers de cette ligne
         ligne = ligne.strip()
@@ -50,55 +48,50 @@ def write(fileName, content):
 
 
 def main(args):
-    global m,n,visited
-    """Fonction main/Main function"""
     input_file = args[0]
     output_file = args[1]
 
     matrice = []
-
-    # TODO : Compléter ici/Complete here...
-    matrice = read_problem(matrice,input_file)
-
+    matrice = read_problem(matrice, input_file)
 
     def coordonneespuits(matrice):
-        coordonneespuits = {}
         listeCoordonnees = set()
-        # je dois creer un cadre
         nombreColonne = len(matrice[0])
         nombreLigne = len(matrice)
         for j in range(nombreLigne):
             for i in range(nombreColonne):
                 if matrice[j][i] == 1:
-                    listeCoordonnees.add((j,i))
+                    listeCoordonnees.add((j, i))
         return listeCoordonnees
 
     def explorer_adjacents(cell, listeCoordonnees):
-        j, i = cell
-        cellules_adjacentes = [(j - 1, i), (j + 1, i), (j, i - 1), (j, i + 1)]
+        visited = set()
+        stack = [cell]
 
-        # Pour chaque cellule adjacente, répétez le processus
-        for adj in cellules_adjacentes:
-            if adj in listeCoordonnees:
-                visited.add(adj)
-                listeCoordonnees.discard(adj)
-                explorer_adjacents(adj, listeCoordonnees)
+        while stack:
+            j, i = stack.pop()
+            if (j, i) in visited:
+                continue
+            visited.add((j, i))
+
+            cellules_adjacentes = {(j - 1, i), (j + 1, i), (j, i - 1), (j, i + 1)}
+            tmp = listeCoordonnees.intersection(cellules_adjacentes)
+            stack.extend(tmp)
+            listeCoordonnees -= tmp
+
+        return visited
 
     listeCoordonnees = coordonneespuits(matrice)
+    listeParcours = []
 
-    listeParcours  = []
-
-    while len(listeCoordonnees) > 0 :
+    while listeCoordonnees:
         element = listeCoordonnees.pop()
-        visited = {element}
-        sys.setrecursionlimit(1000000)
-        explorer_adjacents(element,listeCoordonnees)
-        if len(visited) > 0:
+        visited = explorer_adjacents(element, listeCoordonnees)
+        if visited:
             listeParcours.append(visited)
-    try:
-        answer = max(len(sous_ensemble) for sous_ensemble in listeParcours)
-    except:
-        answer = 0
+
+    a = 0
+    answer = max(len(sous_ensemble) for sous_ensemble in listeParcours) if listeParcours else 0
 
     # answering
     write(output_file, str(answer))
