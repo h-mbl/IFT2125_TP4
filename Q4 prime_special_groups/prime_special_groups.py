@@ -16,23 +16,17 @@ def main(args):
     n = int(args[0])
     output_file = args[1]
 
-    limite = 10000
+    limite = 11058 # le plus grand nombre premier necessaire pour generer n = 100 est 11057
     primes = listPrimes(limite)
     graphe = construireGraphe(primes)
     cliques = trouverCliques(graphe)
 
-    my = dict()
+
     sommes = [sum(clique) for clique in cliques]
     sommes.sort()
 
-    a = 100
-    multiples_de_3 = [3 * i for i in range(1,a)]
-    multiples_de_3 = [1,0] + multiples_de_3
-    # Filtrer les éléments avec des indices divisibles par 2
-    #multiples_paires = [multiples_de_3[i] for i in range(len(multiples_de_3)) if i % 2 == 0]
-    #position =  multiples_paires[n-1] -1
     position = n - 1
-    a = 0
+
     answer = sommes[position]
     write(output_file, str(answer))
 
@@ -88,7 +82,7 @@ def millerRabinPrim(n, k=20):
     while d % 2 == 0:
         s, d = s + 1, d // 2
 
-    tabA = [random.randint(2,n-2)]
+    tabA = [random.randint(2,n-2)] # tabA pour Miller Rabin deterministe
     if n < 2047:
         tabA = [2]
     elif n < 1373653:
@@ -99,7 +93,6 @@ def millerRabinPrim(n, k=20):
         tabA = [2,3,5]
     elif n < 3215031751:
         tabA = [2,3,5,7]
-    
 
 
     for a in tabA:
