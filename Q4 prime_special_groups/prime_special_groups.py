@@ -2,7 +2,7 @@
 #Nom, Matricule
 
 import math
-import random 
+import random
 import sys
 
 def write(fileName, content):
@@ -11,149 +11,109 @@ def write(fileName, content):
     file.write(content)
     file.close()
 
-def main(args):
 
+def main(args):
     n = int(args[0])
     output_file = args[1]
 
+    limite = 10000
+    primes = listPrimes(limite)
+    graphe = construireGraphe(primes)
+    cliques = trouverCliques(graphe)
 
-    # Vous pouvez découper votre code en d'autres fonctions...
-    # You may split your code in other functions...
+    my = dict()
+    sommes = [sum(clique) for clique in cliques]
+    sommes.sort()
 
-   # primes = listPrimes(10 ** 4)
-    answer = 0
-    primes_100 = listPrimes(10000)
-    # TODO : Determiner la limite pour faire passer les tests
-
-    graphe = graphe_initialisation(primes_100)
-    print(graphe)
-    cliques = find_clique(graphe,[])
-    print(cliques)
-    result = []
-    for clique in cliques:
-        somme = 0
-        for elem in clique:
-            somme += elem
-        result.append(somme)
-    result.sort()
-    print(result)
-    answer = result[n-1]
-    print(len(answer))
-
-    print(answer)
-
-    # answering
+    a = 100
+    multiples_de_3 = [3 * i for i in range(1,a)]
+    multiples_de_3 = [1,0] + multiples_de_3
+    # Filtrer les éléments avec des indices divisibles par 2
+    #multiples_paires = [multiples_de_3[i] for i in range(len(multiples_de_3)) if i % 2 == 0]
+    #position =  multiples_paires[n-1] -1
+    position = n - 1
+    a = 0
+    answer = sommes[position]
     write(output_file, str(answer))
 
 
-def primPaires(primes, prime):
-    """fonction qui retourne les primes specials d'un prime donne"""
-    ens = set()
-    i = primes.index(prime)
-    primeGrand = primes[i+1:]
-    for prime2 in primeGrand:
-        if paireSpeciale(prime2,prime):
-            ens.add(prime2)
-    return ens
+def construireGraphe(primes):
+    graphe = {p: set() for p in primes}
+    for i in range(len(primes)):
+        for j in range(i + 1, len(primes)):
+            p, q = primes[i], primes[j]
+            if paireSpeciale(p, q):
+                graphe[p].add(q)
+                graphe[q].add(p)
+    return graphe
 
-#la cache des paire speciales
-special_pairs_cache = {}
 
-def paireSpeciale(a,b):
-    #return combEstPrime(a,b) and combEstPrime(b,a)
-    if (a, b) in special_pairs_cache:
-        return special_pairs_cache[(a, b)]
-    result = combEstPrime(a, b) and combEstPrime(b, a)
-    special_pairs_cache[(a, b)] = result
-    special_pairs_cache[(b, a)] = result
-    return result
+def trouverCliques(graphe):
+    cliques = []
+    for p, curr in graphe.items():
+        for q in curr:
+            for r in curr:
+                if r > q and r in graphe[q]:
+                    for s in curr:
+                        if s > r and s in graphe[q] and s in graphe[r]:
+                            if estEnsSpecial(p, q, r, s):
+                                clique = tuple(sorted([p, q, r, s]))
+                                if clique not in cliques:
+                                    cliques.append(clique)
+    return cliques
+
+def estEnsSpecial(p, q, r, s):
+    return all(paireSpeciale(a, b) for a, b in [(p, q), (p, r), (p, s), (q, r), (q, s), (r, s)])
+
+
+def paireSpeciale(p, q):
+    return millerRabinPrim(int(str(p) + str(q))) and millerRabinPrim(int(str(q) + str(p)))
+
 
 def listPrimes(limite):
     primes = []
     for num in range(2, limite):
-        if not millerRabinPrim(num):
-            continue
-        else: primes.append(num)
+        if millerRabinPrim(num):
+            primes.append(num)
     return primes
-def graphe_initialisation(primes):
-    graphe = dict()
-    for prime in primes:
-        print(len(primes), primes.index(prime))
-        graphe[prime] = primPaires(primes,prime)
-    return graphe
-
-def find_clique(graphe,result):
-    """parcours DFS pour trouver 4 cliques"""
-    for key in graphe:
-        print(len(graphe),list(graphe.keys()).index(key))
-        curr = graphe[key]
-        for elem in curr:
-            elemEns = graphe[elem]
-            if len(elemEns & curr) >= 2:
-                for elem3 in elemEns:
-                    elem3Ens = graphe[elem3]
-                    if len(elemEns & curr & elem3Ens) >= 1:
-                        print(elem3Ens,1333)
-                        for elem4 in elem3Ens:
-                            if estEnsSpecial(key,elem,elem3,elem4):
-
-                                subResult = [key,elem,elem3,elem4]
 
 
-                                result.append(subResult)
-
-
-    return result
-
-def estEnsSpecial(a,b,c,d):
-    tab = [a,b,c,d]
-    for i in range(len(tab)):
-        for j in range(i + 1, len(tab)):
-            if not paireSpeciale(tab[i], tab[j]):
-                return False
-    return True
-def combinerInts(a , b):
-
-    return int(str(a) + str(b))
-
-def combEstPrime(a,b):
-    return millerRabinPrim(combinerInts(a,b))
-
-def bTest(a, n):
-    s = 0
-    t = n - 1
-    while(t % 2 == 1):
-        s += 1
-        t = t//2
-
-
-    x = pow(a,t) % n
-
-
-    if x == 1 or x == n - 1:
-        return True
-
-    for i in range(1,s):
-
-        x = pow(x,2) % n
-        if x == n - 1:
-            return True
-    return False
-
-def millerRabinPrim(n):
+def millerRabinPrim(n, k=20):
     if n == 2 or n == 3:
         return True
     if n % 2 == 0:
         return False
-    tabA = [2,3,5,7]
-    if n < 10**24:
-        for a in tabA:
-            if a > n-2: continue
-            if not bTest(a, n):
-                return False #algo faux-biaise
-        return True
-    a = random.randint(2,n-2)
-    return bTest(a, n)
+
+    s, d = 0, n - 1
+    while d % 2 == 0:
+        s, d = s + 1, d // 2
+
+    tabA = [random.randint(2,n-2)]
+    if n < 2047:
+        tabA = [2]
+    elif n < 1373653:
+        tabA = [2,3]
+    elif n < 9080191:
+        tabA = [31,73]
+    elif n < 25326001:
+        tabA = [2,3,5]
+    elif n < 3215031751:
+        tabA = [2,3,5,7]
+    
+
+
+    for a in tabA:
+        for _ in range(k):
+            x = pow(a, d, n)
+            if x == 1 or x == n - 1:
+                continue
+            for _ in range(s - 1):
+                x = pow(x, 2, n)
+                if x == n - 1:
+                    break
+            else:
+                return False
+    return True
 
 
 # NE PAS TOUCHER

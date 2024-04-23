@@ -20,14 +20,19 @@ def main(args):
     primes = listPrimes(limite)
     graphe = construireGraphe(primes)
     cliques = trouverCliques(graphe)
-    sommes = [sum(clique) for clique in cliques]
+    sommes = {}
+    for clique in cliques:
+        sommes[sum(clique)] = clique
+
     sommes.sort()
+    print(sommes)
     a = 100
     multiples_de_3 = [3 * i for i in range(1,a)]
     multiples_de_3 = [1,0] + multiples_de_3
     # Filtrer les éléments avec des indices divisibles par 2
     multiples_paires = [multiples_de_3[i] for i in range(len(multiples_de_3)) if i % 2 == 0]
     position =  multiples_paires[n-1] -1
+    position = n - 1
     a = 0
     answer = sommes[position]
     write(output_file, str(answer))
