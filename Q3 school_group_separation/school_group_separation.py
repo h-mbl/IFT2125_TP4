@@ -1,5 +1,5 @@
-# Nom, matricule
-# Nom, matricule
+# Herve Ng'isse (20204609)
+# Qiwu Wen (20230961)
 
 import sys
 from collections import defaultdict

@@ -1,5 +1,5 @@
-# Nom, Matricule
-# Nom, Matricule
+# Herve Ng'isse (20204609)
+# Qiwu Wen (20230961)
 
 import sys
 
