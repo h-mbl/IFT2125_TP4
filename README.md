@@ -13,6 +13,9 @@ To run the solution for this problem, use the following command:
 python3 well_location.py <input_file>
 ```
 
+![image](https://github.com/h-mbl/IFT2125_TP4/assets/125308992/a0819d3e-da53-46ab-8b8f-8b8cb56ac8da)
+
+
 
 ##Problem 2: Unruly schoolchildren
 
@@ -48,7 +51,8 @@ The first 3 special sets of 4 prime numbers in order of increasing total sum are
 (3, 7, 109, 673) with a sum of 792
 (23, 311, 677, 827) with a sum of 1838
 (3, 37, 67, 2377) with a sum of 2484
-Usage
+
+### Usage
 To run the solution for this problem, use the following command:
 
 ```sh
@@ -59,7 +63,9 @@ To run the test script, use the following command:
 ```sh
 python3 test_prime_special_groups.py
 ```
-Files
+![image](https://github.com/h-mbl/IFT2125_TP4/assets/125308992/ea892c6c-ee2d-440c-a00d-1d2f5106d246)
+
+## Files
 well_location.py: Solution for the water well location problem.
 schoolchildren.py: Solution for the unruly schoolchildren problem.
 prime_special_groups.py: Solution for the prime numbers special sets problem.
