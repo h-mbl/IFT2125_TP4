@@ -17,7 +17,7 @@ python3 well_location.py <input_file>
 
 
 
-##Problem 2: Unruly schoolchildren
+## Problem 2: Unruly schoolchildren
 
 ### Description
 elementary school consults you about a problem with unruly schoolchildren. Teachers have noted that certain pairs of pupils are dangerous: when you put two children from a dangerous pair in the same group for an activity, you can almost certainly expect behavioral problems to arise at some point. With a list of schoolchildren and a list of dangerous pairs, determine whether the children can be separated into two groups such that each dangerous pair is separated between the two groups. If possible, return a combination of children in two groups that works, otherwise return "impossible".
